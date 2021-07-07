@@ -142,6 +142,23 @@ func overwriteSnapshot(store *raftwal.DiskStorage) error {
 	cs := snap.Metadata.ConfState
 	fmt.Printf("Confstate: %+v\n", cs)
 
+	deadPeerMap := make(map[uint64]struct{})
+	deadPeerStrs := strings.Split(opt.deadPeers, ",")
+	for _, p := range deadPeerStrs {
+		id, err := strconv.Atoi(p)
+		x.Check(err)
+		deadPeerMap[uint64(id)] = struct{}{}
+	}
+	var validPeers []uint64
+	for _, p := range cs.Nodes {
+		if _, ok := deadPeerMap[p]; ok {
+			fmt.Printf("slaffy - peer filtered because it was dead: %+v\n", p)
+		} else {
+			validPeers = append(validPeers, p)
+		}
+	}
+	cs.Nodes = validPeers
+
 	var dsnap pb.Snapshot
 	if len(snap.Data) > 0 {
 		x.Check(dsnap.Unmarshal(snap.Data))

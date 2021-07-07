@@ -557,12 +557,12 @@ func export(ctx context.Context, in *pb.ExportRequest) (ExportedFiles, error) {
 	glog.Infof("Export requested at %d for namespace %d.", in.ReadTs, in.Namespace)
 
 	// Let's wait for this server to catch up to all the updates until this ts.
-	if err := posting.Oracle().WaitForTs(ctx, in.ReadTs); err != nil {
-		return nil, err
-	}
-	glog.Infof("Running export for group %d at timestamp %d.", in.GroupId, in.ReadTs)
+	// if err := posting.Oracle().WaitForTs(ctx, in.ReadTs); err != nil {
+	// 	return nil, err
+	// }
+	// glog.Infof("Running export for group %d at timestamp %d.", in.GroupId, in.ReadTs)
 
-	return exportInternal(ctx, in, pstore, false)
+	return exportInternal(ctx, in, pstore, true)
 }
 
 // exportInternal contains the core logic to export a Dgraph database. If skipZero is set to

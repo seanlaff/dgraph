@@ -69,6 +69,8 @@ type flagOptions struct {
 	noKeys        bool
 	key           x.SensitiveByteSlice
 
+	deadPeers string
+
 	// Options related to the WAL.
 	wdir           string
 	wtruncateUntil uint64
@@ -108,6 +110,8 @@ func init() {
 	flag.StringVarP(&opt.wsetSnapshot, "snap", "s", "",
 		"Set snapshot term,index,readts to this. Value must be comma-separated list containing"+
 			" the value for these vars in that order.")
+	flag.StringVar(&opt.deadPeers, "deadpeers", "",
+		"Comma-separated list of peer IDs to drop")
 	ee.RegisterEncFlag(flag)
 }
 

@@ -17,6 +17,7 @@
 package raftwal
 
 import (
+	"fmt"
 	"math"
 	"sync"
 
@@ -173,6 +174,23 @@ func (w *DiskStorage) InitialState() (hs raftpb.HardState, cs raftpb.ConfState, 
 	if err != nil {
 		return
 	}
+	deadPeers := make(map[uint64]struct{})
+	deadPeers[2] = struct{}{}
+	deadPeers[3] = struct{}{}
+	deadPeers[13] = struct{}{}
+	deadPeers[14] = struct{}{}
+	deadPeers[15] = struct{}{}
+	deadPeers[16] = struct{}{}
+
+	var validPeers []uint64
+	for _, p := range snap.Metadata.ConfState.Nodes {
+		if _, ok := deadPeers[p]; ok {
+			fmt.Println("slaffy - filtering peer", p)
+		} else {
+			validPeers = append(validPeers, p)
+		}
+	}
+	snap.Metadata.ConfState.Nodes = validPeers
 	return hs, snap.Metadata.ConfState, nil
 }
 
